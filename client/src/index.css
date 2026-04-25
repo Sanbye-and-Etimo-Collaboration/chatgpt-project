@@ -194,6 +194,28 @@ code {
   background-color: rgb(47, 94, 133);
 }
 
+.chatMessage.success {
+  background:
+  linear-gradient(rgba(43, 204, 34, 0.1), rgba(42, 204, 34, 0.3)),
+  rgb(47, 94, 133);
+  border: solid 2px rgb(43, 204, 34, 0.5);
+}
+
+.chatMessage.error {
+  background:
+  linear-gradient(rgba(204, 34, 34, 0.3), rgba(204, 34, 34, 0.5)),
+  rgb(47, 94, 133);
+}
+
+.explanation{
+  background-color: var(--app-dark-grey);
+  margin-top: 1rem;
+  font-weight: bold;
+  border: solid 2px rgba(204, 34, 34, 0.5);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
 .avatar {
   display: flex;
   align-items: center;
@@ -212,7 +234,7 @@ code {
   background-color: var(--app-green);
 }
 
-.avatar.false{
+.avatar.user{
   background-image: url("./images/shrek.jpg");
   background-size: cover;
 }

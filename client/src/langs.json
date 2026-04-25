@@ -3,18 +3,15 @@
         "name": "Francais",
         "promptInfo": {
             "determinant": "de ",
-            "codeIso": "fr",
-            "emoji": "🇫🇷"
+            "codeIso": "fr"
         },
         "flag": "https://flagcdn.com/fr.svg"
     },
-
     "german": {
         "name": "Allemand",
         "promptInfo": {
             "determinant": "d'",
-            "codeIso": "de",
-            "emoji": "🇩🇪"
+            "codeIso": "de"
         },
         "flag": "https://flagcdn.com/de.svg"
     },
@@ -22,8 +19,7 @@
         "name": "Italien",
         "promptInfo": {
             "determinant": "d'",
-            "codeIso": "it",
-            "emoji": "🇮🇹"
+            "codeIso": "it"
         },
         "flag": "https://flagcdn.com/it.svg"
     },
@@ -31,8 +27,7 @@
         "name": "Espagnol",
         "promptInfo": {
             "determinant": "d'",
-            "codeIso": "es",
-            "emoji": "🇪🇸"
+            "codeIso": "es"
         },
         "flag": "https://flagcdn.com/es.svg"
     },
@@ -40,8 +35,7 @@
         "name": "Japonais",
         "promptInfo": {
             "determinant": "de ",
-            "codeIso": "ja",
-            "emoji": "🇯🇵"
+            "codeIso": "ja"
         },
         "flag": "https://flagcdn.com/jp.svg"
     },
@@ -49,8 +43,7 @@
         "name": "Russe",
         "promptInfo": {
             "determinant": "de ",
-            "codeIso": "ru",
-            "emoji": "🇷🇺"
+            "codeIso": "ru"
         },
         "flag": "https://flagcdn.com/ru.svg"
     },
@@ -58,8 +51,7 @@
         "name": "Chinois",
         "promptInfo": {
             "determinant": "de ",
-            "codeIso": "zh",
-            "emoji": "🇨🇳"
+            "codeIso": "zh"
         },
         "flag": "https://flagcdn.com/cn.svg"
     }
