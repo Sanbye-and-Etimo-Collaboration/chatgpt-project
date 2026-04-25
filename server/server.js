@@ -70,7 +70,7 @@ app.post('/', async (req, res) => {
     }
 
     // Uncomment the next line to test Input values
-    // logInputValues()
+    logInputValues()
 
     try {
         response = await openai.chat.completions.create({
@@ -78,15 +78,14 @@ app.post('/', async (req, res) => {
         messages: messages,
         /*max_tokens: parseInt(maxTokens)*/
         })
-        console.log(response.choices[0].message.content)
     } catch(e) { console.log(e) }
     
     const speechFile = path.resolve("../client/speech.mp3");
     const input = response.choices[0].message.content;
-    const matches = input.match(/<DE>(.*?)<\/DE>/g);
+    const matches = input.match(/<de>(.*?)<\/de>/g);
 
-    const wordsBetweenTags = matches?.map(match => match.replace(/<\/?DE>/g, ""));
-    console.log(wordsBetweenTags); // Cela affichera un tableau avec les mots entre balises <DE>
+    const wordsBetweenTags = matches?.map(match => match.replace(/<\/?de>/g, ""));
+    console.log("Partie à écouter : " + wordsBetweenTags? wordsBetweenTags : "Partie à écouter : undefined");
     
     const mp3 = await openai.audio.speech.create({
         model: "tts-1",

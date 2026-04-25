@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { ChatMessage, TokenPrice, HookSlider } from './library/components'
-import './library/functions'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 import './index.css'
@@ -17,7 +16,6 @@ function App() {
   const messagesEndRef = useRef(null);
   const [transcription, setTranscription] = useState('');
   const handleTranscription = (text) => {
-    console.log(text)
     setTranscription(text);
   };
   const [selectedLang, setSelectedLang] = useState({flag: null, name: "Select a langage"})
@@ -26,9 +24,16 @@ function App() {
 
   }
 
+  console.log(model)
+
   const handleSelectLang = (lang) => {
     setSelectedLang(lang)
-    setContextPrompt(`Je veux que tu agisses comme un correcteur ${lang.promptInfo.determinant}${lang.name}. Tu vas pointer du doigt mes erreurs en Français et me donner une correction. Tu continues la conversation normalement en ${lang.name} que tu mettras dans des balises commencant par ${"<"+lang.promptInfo.emoji}> et finissant par ${"</"+lang.promptInfo.emoji}>.`)
+    setContextPrompt(`Je veux que tu agisse comme un professeur ${lang.promptInfo.determinant}${lang.name}. Tu dois annalyser si j'ai commis une erreur. Si je fais une erreur la première partie de ta réponse sera une correction en français et entre les balises <explanation></explanation>. De plus, tu écriras <result>WRONG</result> si j'ai commis une erreur, sinon tu écriras <result>RIGHT</result> dans la première partie. La deuxième partie sera ta réponse en ${lang.name} a ce que je viens de te dire, pas de correctif ici, juste une réponse naturelle. Ta réponse sera de niveau A1(CECRL), elle sera courte et facile à comprendre. Tu mettra la deuxième partie de ta réponse dans des balises commencent par ${"<"+lang.promptInfo.codeIso}> et finissant par ${"</"+lang.promptInfo.codeIso}>. `)
+    const newContextPrompt = chatLog.map((el)=>{ 
+      if (el===chatLog[0]){
+        return { role: "system", content: contextPrompt }
+      }else {return el}})
+    setChatLog(newContextPrompt)
   }
 
   useEffect(()=>{
@@ -63,17 +68,35 @@ function App() {
     }).then(setChatLog([...chatLogRefresh, { role: "assistant", isWaiting: true } ]))
 
     const data = await response.json()
-    console.log(data.GPTresponse)
     const audioRes = await fetch(`http://localhost:4080${data.audioUrl}`, {
       method: "GET"
     })
 
+    const success = [...data.GPTresponse.matchAll(/<result>(.*?)<\/result>/g)];
+    const errorMessage = [...data.GPTresponse.matchAll(/<explanation>(.*?)<\/explanation>/g)];
+    const result = [...data.GPTresponse.matchAll(/<de>(.*?)<\/de>/g)];
+    const cleanedGPTResponse = data.GPTresponse?.replace(/<result>.*?<\/result>\s*/s, '').replace(/<explanation>.*?<\/explanation>\s*/s, '').replace(/<de>.*?<\/de>\s*/s, '');
+    const updatedChatLog = [...chatLogRefresh];
     const audioBlob = await audioRes.blob(); // Get the audio as a blob
     const audioUrl = URL.createObjectURL(audioBlob); // Create a URL for the blob
     const audio = new Audio(audioUrl); // Create a new Audio object
     audio.play(); // Play the audio
 
-    setChatLog([...chatLogRefresh, { role: "assistant", content: `${data.GPTresponse}` }])
+    if (updatedChatLog.length > 0) {
+      updatedChatLog[updatedChatLog.length - 1] = {
+        ...updatedChatLog[updatedChatLog.length - 1],
+        success: success[0][1], 
+        errorMessage: errorMessage.length>0 ? errorMessage[0][1] : ""
+      };
+    }
+
+    updatedChatLog.push({
+      role: "assistant",
+      content: `${data.GPTresponse}`,
+      cleanedGPTResponse: result.length>0 ? result[0][1] : cleanedGPTResponse
+    });
+    
+    setChatLog(updatedChatLog);
   }
 
   return (
@@ -87,6 +110,7 @@ function App() {
           <select className='models-selector' defaultValue="gpt-4o-mini" onChange={(e) => {
             setModel(e.target.value)
             }}>
+            <option value="gpt-4.1-2025-04-14">gpt-4.1</option>
             <option value="gpt-4o-mini">gpt-4o-mini</option>
             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
             <option value="code-davinci-002">code-davinci-002</option>
@@ -131,8 +155,6 @@ function App() {
               
             <form onSubmit={(e) => { 
               e.preventDefault()
-              chatLog[0].content = contextPrompt
-              console.log(contextPrompt)
               }}>
               <input value={contextPrompt} type='text' className='context-textarea'
                 onChange={(e) => setContextPrompt(e.target.value)}
@@ -147,7 +169,7 @@ function App() {
           <ChatMessage message={{ role: 'assistant', content: 'Bonjour, comment puis-je vous aider ?' }} />
         
           {chatLog.filter((msg) => msg.role === "assistant" || msg.role === "user").map((message, index) => (
-            <ChatMessage key={index} message={message} />
+            <ChatMessage key={index} message={message}/>
           ))}
 
           <div ref={messagesEndRef} />
